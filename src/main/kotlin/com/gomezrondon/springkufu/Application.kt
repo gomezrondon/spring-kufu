@@ -6,13 +6,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
-import org.springframework.web.servlet.function.HandlerFunction
+import org.springframework.web.servlet.function.*
 import org.springframework.web.servlet.function.RequestPredicates.*
-import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.RouterFunctions.nest
 import org.springframework.web.servlet.function.RouterFunctions.route
-import org.springframework.web.servlet.function.ServerRequest
-import org.springframework.web.servlet.function.ServerResponse
 import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -21,16 +18,29 @@ import javax.persistence.Id
 class Application{
 
 	@Bean
-	fun routes(handler: PersonHandler): RouterFunction<ServerResponse> {
+	fun routesWithKotlinDSL(handler: PersonHandler): RouterFunction<ServerResponse> = router {
+		"/person".nest {
+			GET("/", handler::readAll)
+			GET("/{id}", handler::readOne)
+		}
 
-		return nest(
-				path("/person"),
-				route(
-						GET("/{id}"),
-						HandlerFunction { handler.readOne(it) })
-						.andRoute(method(HttpMethod.GET),
-								HandlerFunction { handler.readAll(it) })
-		)
+		"/otro".nest {
+			GET("/", handler::readAll)
+			GET("/{id}", handler::readOne)
+		}
+	}
+
+	@Bean
+	fun routesWithKotlinDSL2(handler: PersonHandler): RouterFunction<ServerResponse> = router {
+		"/person2".nest {
+			GET("/", handler::readAll)
+			GET("/{id}", handler::readOne)
+		}
+
+		"/otro2".nest {
+			GET("/", handler::readAll)
+			GET("/{id}", handler::readOne)
+		}
 	}
 }
 
